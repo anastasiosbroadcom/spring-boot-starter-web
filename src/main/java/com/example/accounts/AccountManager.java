@@ -6,7 +6,7 @@ public interface AccountManager {
 
     List<Account> getAll();
 
-    Account retrieve(int id);
+    Account retrieve(long id);
 
     Account save(Account newAccount);
 

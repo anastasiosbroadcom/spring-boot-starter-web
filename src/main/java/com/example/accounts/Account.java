@@ -3,10 +3,15 @@ package com.example.accounts;
 public class Account {
 
     private Long Id;
-	private String Name;
-	private String Email;
-	private String Password;
-	private String Status;
+	private String name;
+	private String email;
+	private String password;
+	private String status;
+
+    public Account(Long id, String name) {
+        this.Id = id;
+        this.name = name;
+    }
 
     public Long getId() {
 		return Id;
@@ -18,35 +23,35 @@ public class Account {
 
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
+        this.email = email;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     public void setPassword(String password) {
-        Password = password;
+        this.password = password;
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
     }
 
 }

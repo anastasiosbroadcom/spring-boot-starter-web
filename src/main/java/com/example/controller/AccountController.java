@@ -6,14 +6,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-//import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.accounts.Account;
 import com.example.accounts.AccountManager;
@@ -46,8 +49,8 @@ public class AccountController {
 	 * Provide the details of an account with the given id.
 	 */
 	@GetMapping(value = "/accounts/{id}")
-	public Account userDetails(@PathVariable int id) {
-		return accountManager.retrieve(id);
+	public Account accountDetails(@PathVariable int id) {
+		return retrieveAccount(id);
 	}
 
 	/**
@@ -66,11 +69,22 @@ public class AccountController {
 	 * response.
 	 */
 	@DeleteMapping(value = "/accounts/id")
-	public void deleteAccount(@PathVariable int id) {
+	public void deleteAccount(@PathVariable long id) {
 		Account account = accountManager.retrieve(id);
 		accountManager.delete(account);
 
     }
+
+	/**
+	 * Maps IllegalArgumentExceptions to a 404 Not Found HTTP status code.
+	 */
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ExceptionHandler({ IllegalArgumentException.class })
+	public void handleNotFound(Exception ex) {
+		logger.error("Exception is: ", ex);
+		// just return empty 404
+	}
+
 
 	/**
 	 * Return a response with the location of the new resource.
@@ -84,15 +98,27 @@ public class AccountController {
 
 		// Determines URL of child resource based on the full URL of the given
 		// request, appending the path info with the given resource Identifier
-		// URI location = ServletUriComponentsBuilder
-		// 		.fromCurrentRequestUri()
-		// 		.path("/{resourceId}")
-		// 		.buildAndExpand(resourceId)
-		// 		.toUri();
+		URI location = ServletUriComponentsBuilder
+		 		.fromCurrentRequestUri()
+		 		.path("/{resourceId}")
+		 		.buildAndExpand(resourceId)
+		 		.toUri();
 
 		// Return an HttpEntity object - it will be used to build the
 		// HttpServletResponse
-		return ResponseEntity.created(URI.create("null")).build();
+		return ResponseEntity.created(location).build();
+	}
+
+	/**
+	 * Finds the Account with the given id, throwing an IllegalArgumentException
+	 * if there is no such Account.
+	 */
+	private Account retrieveAccount(long accountId) throws IllegalArgumentException {
+		Account account = accountManager.retrieve(accountId);
+		if (account == null) {
+			throw new IllegalArgumentException("No such account with id " + accountId);
+		}
+		return account;
 	}
 
 }
