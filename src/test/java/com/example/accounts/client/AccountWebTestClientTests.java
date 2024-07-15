@@ -11,8 +11,6 @@ import com.example.accounts.Account;
 
 import reactor.core.publisher.Mono;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.*;
@@ -40,21 +38,6 @@ public class AccountWebTestClientTests {
                      });
     }
 
-    @Test
-    public void getAccount_WebTestClient() {
-        String url = "/accounts/{Id}";
-
-        webTestClient.get()
-                     .uri(url, 0)
-                     .exchange()
-                     .expectStatus().isOk()
-                     .expectBody(Account.class)
-                     .consumeWith(response -> {
-                         Account account = response.getResponseBody();
-                         assertThat(account.getName()).isEqualTo("John Doe");
-                     });
-
-    }
 
     @Test
     public void createAccount_WebTestClient() {
@@ -71,50 +54,21 @@ public class AccountWebTestClientTests {
                      .exchange()
                      .expectStatus().isCreated()
                      .expectHeader().value("Location", location -> {
-            try {
-                URI newAccountLocation = new URI(location);
-                webTestClient.get()
-                             .uri(newAccountLocation)
-                             .exchange()
-                             .expectStatus().isOk()
-                             .expectBody(Account.class)
-                             .consumeWith(response -> {
-                                 Account retrievedAccount = response.getResponseBody();
-                                 assertThat(retrievedAccount.getId()).isEqualTo(account.getId());
-                                 assertThat(retrievedAccount.getName()).isEqualTo(account.getName());
-                             });
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+                
+                 webTestClient.get().uri(url)
+                     .accept(MediaType.APPLICATION_JSON)
+                     .exchange()
+                     .expectStatus().isOk()
+                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                     .expectBody(Account[].class)
+                     .consumeWith(response -> {
+                         Account[] accounts = response.getResponseBody();
+                         assertThat(accounts.length >= 5).isTrue();
+                     });
+            
         });
 
     }
 
-	@Test
-	public void deleteAccount_WebTestClient() {
-
-		String addUrl = "/accounts";
-
-		webTestClient.post().uri(addUrl, 1)
-					 .contentType(MediaType.APPLICATION_JSON)
-					 .accept(MediaType.APPLICATION_JSON)
-					 .body(Mono.just("{ \"id\": 999, \"name\": \"David\" }"), String.class)
-					 .exchange()
-					 .expectStatus().isCreated()
-					 .expectHeader().value("Location", location -> {
-			try {
-				URI newBeneficiaryLocation = new URI(location);
-				
-				webTestClient.delete()
-							 .uri(newBeneficiaryLocation)
-							 .exchange()
-							 .expectStatus().isNoContent();
-
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-			}
-		});
-
-	}
 
 }

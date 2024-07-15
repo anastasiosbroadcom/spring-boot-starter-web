@@ -3,8 +3,6 @@ package com.example.accounts;
 import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,38 +20,25 @@ public class FakeAccountManager implements AccountManager {
         return accounts;
     }
 
-    @Override
-    public Account retrieve(long id) {
-        Optional<Account> account = accounts.stream().filter(c -> c.getId().equals(id)).findFirst();
-        if (account.isPresent())
-            return account.get();
-        
-        return null;
-    }
 
     @Override
     public Account save(Account newAccount) {
-        Account retrievedAccount = retrieve(newAccount.getId());
-        if(retrievedAccount == null){
-            accounts.add(newAccount);
-        } else{
-            retrievedAccount.setEmail(newAccount.getEmail());
-            retrievedAccount.setName(newAccount.getName());
-            retrievedAccount.setPassword(newAccount.getPassword());
-            retrievedAccount.setStatus(newAccount.getStatus());
-        }
-        
-        return retrieve(newAccount.getId());
+        accounts.add(newAccount);
+        return newAccount;
     }
+
+
+    @Override
+    public Account retrieve(long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'retrieve'");
+    }
+
 
     @Override
     public void delete(Account account) {
-        Account retrievedAccount = retrieve(account.getId());
-        if(retrievedAccount != null){
-            accounts.remove(account);
-        } else{
-            throw new NullPointerException(String.format("Account with id s% not found!", account.getId()));
-        }
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'delete'");
     }
 
 }

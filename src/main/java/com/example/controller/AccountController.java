@@ -8,10 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -46,14 +44,6 @@ public class AccountController {
 	}
 
 	/**
-	 * Provide the details of an account with the given id.
-	 */
-	@GetMapping(value = "/accounts/{id}")
-	public Account accountDetails(@PathVariable int id) {
-		return retrieveAccount(id);
-	}
-
-	/**
 	 * Creates a new Account, setting its URL as the Location header on the
 	 * response.
 	 */
@@ -61,18 +51,6 @@ public class AccountController {
 	public ResponseEntity<Void> createAccount(@RequestBody Account newAccount) {
 		Account account = accountManager.save(newAccount);
 		return entityWithLocation(account.getId());
-    }
-
-
-    /**
-	 * Creates a new Account, setting its URL as the Location header on the
-	 * response.
-	 */
-	@DeleteMapping(value = "/accounts/{id}")
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void deleteAccount(@PathVariable long id) {
-		Account account = retrieveAccount(id);
-		accountManager.delete(account);
     }
 
 	/**
@@ -107,18 +85,6 @@ public class AccountController {
 		// Return an HttpEntity object - it will be used to build the
 		// HttpServletResponse
 		return ResponseEntity.created(location).build();
-	}
-
-	/**
-	 * Finds the Account with the given id, throwing an IllegalArgumentException
-	 * if there is no such Account.
-	 */
-	private Account retrieveAccount(long accountId) throws IllegalArgumentException {
-		Account account = accountManager.retrieve(accountId);
-		if (account == null) {
-			throw new IllegalArgumentException("No such account with id " + accountId);
-		}
-		return account;
 	}
 
 }

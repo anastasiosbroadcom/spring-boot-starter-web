@@ -14,7 +14,6 @@ import com.example.controller.AccountController;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AccountControllerTests {
 
@@ -23,13 +22,6 @@ public class AccountControllerTests {
 	@BeforeEach
 	public void setUp() throws Exception {
 		controller = new AccountController(new FakeAccountManager());
-	}
-
-	@Test
-	public void accountDetails() {
-		Account account = controller.accountDetails(0);
-		assertThat(account).isNotNull();
-		assertThat(account.getId()).isEqualTo(Long.valueOf(0));
 	}
 
 	@Test
@@ -53,19 +45,6 @@ public class AccountControllerTests {
 		assertThat(result).isNotNull();
 
 		assertThat(result.getHeaders().getLocation().toString()).isEqualTo("http://localhost/accounts/11223344");
-	}
-
-	@Test
-	public void deleteExistingAccount() {
-		controller.deleteAccount(0L);
-	}
-
-	@Test
-	public void deleteNonExistingAccountFail() {
-
-		assertThrows(IllegalArgumentException.class, () -> {
-			controller.deleteAccount(32L);
-		}, "No such account with id 32");
 	}
 
 	/**
