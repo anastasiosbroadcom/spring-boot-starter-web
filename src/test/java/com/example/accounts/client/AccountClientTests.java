@@ -35,6 +35,8 @@ public class AccountClientTests {
 		Account account = new Account(number, "John Doe");
 		URI newAccountLocation = restTemplate.postForLocation(url, account);
 		
+		//TODO: assert with account retrieval
+
 		Account[] accounts = restTemplate.getForObject(url, Account[].class);
 		assertThat(accounts.length >= 5).isTrue();
 		assertThat(accounts[0].getName()).isEqualTo("John Doe");

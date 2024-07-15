@@ -35,6 +35,7 @@ public class FakeAccountManagerTests {
         accountManager.save(newAccount);
         
         assertEquals(accountManager.getAll().size(), 5);
+        //TODO: include asserts of new created single account retrieval
     }
 
 }

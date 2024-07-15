@@ -45,6 +45,7 @@ public class AccountControllerTests {
 		assertThat(result).isNotNull();
 
 		assertThat(result.getHeaders().getLocation().toString()).isEqualTo("http://localhost/accounts/11223344");
+		//TODO: include asserts of new created single account retrieval
 	}
 
 	/**
