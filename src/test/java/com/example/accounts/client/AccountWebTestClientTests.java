@@ -15,6 +15,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.*;
 
+// TODO implement retrive single account
+// TODO implement delete single account with success and failure
+// TODO implement update single account
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AccountWebTestClientTests {
 

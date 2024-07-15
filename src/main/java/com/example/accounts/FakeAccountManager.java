@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.LinkedList;
 import org.springframework.stereotype.Service;
 
+// TODO implement retrive single account
+// TODO implement delete single account with success and failure
+// TODO implement update single account
 @Service
 public class FakeAccountManager implements AccountManager {
 
