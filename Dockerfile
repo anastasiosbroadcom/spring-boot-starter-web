@@ -1,7 +1,5 @@
 FROM maven:3.9.8-amazoncorretto-21-al2023 as stage1
 
-LABEL org.opencontainers.image.source=https://github.com/anastasiosbroadcom/spring-boot-starter-web
-
 ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 # set working directory
 WORKDIR /opt/demo
@@ -21,5 +19,9 @@ WORKDIR /opt/demo
 COPY --from=stage1 /opt/demo/target/web-0.0.1-SNAPSHOT.jar /opt/demo/web-0.0.1-SNAPSHOT.jar
 
 EXPOSE 8080
+
+LABEL org.opencontainers.image.source=https://github.com/anastasiosbroadcom/spring-boot-starter-web
+LABEL org.opencontainers.image.description="Spring boot web example"
+LABEL org.opencontainers.image.licenses=MIT
 
 ENTRYPOINT ["java","-jar","/opt/demo/web-0.0.1-SNAPSHOT.jar"]
