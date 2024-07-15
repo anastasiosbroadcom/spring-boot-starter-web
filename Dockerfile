@@ -22,5 +22,4 @@ COPY --from=stage1 /opt/demo/target/web-0.0.1-SNAPSHOT.jar /opt/demo/web-0.0.1-S
 
 EXPOSE 8080
 
-#COPY target/web-0.0.1-SNAPSHOT.jar target/web-0.0.1-SNAPSHOT.jar
 ENTRYPOINT ["java","-jar","/opt/demo/web-0.0.1-SNAPSHOT.jar"]
