@@ -68,11 +68,11 @@ public class AccountController {
 	 * Creates a new Account, setting its URL as the Location header on the
 	 * response.
 	 */
-	@DeleteMapping(value = "/accounts/id")
+	@DeleteMapping(value = "/accounts/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteAccount(@PathVariable long id) {
-		Account account = accountManager.retrieve(id);
+		Account account = retrieveAccount(id);
 		accountManager.delete(account);
-
     }
 
 	/**

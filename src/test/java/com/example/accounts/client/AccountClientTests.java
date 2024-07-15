@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import com.example.accounts.Account;
 
 import java.net.URI;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.*;
@@ -22,29 +21,27 @@ public class AccountClientTests {
 	@Autowired
 	private TestRestTemplate restTemplate;
 
-	private Random random = new Random();
-	
 	@Test 
 	public void listAccounts() {
 		String url = "/accounts";
 		// we have to use Account[] instead of List<Account>, or Jackson won't know what type to unmarshal to
 		Account[] accounts = restTemplate.getForObject(url, Account[].class);
-		assertThat(accounts.length >= 21).isTrue();
-		assertThat(accounts[0].getName()).isEqualTo("Keith and Keri Donald");
+		assertThat(accounts.length >= 4).isTrue();
+		assertThat(accounts[0].getName()).isEqualTo("John Doe");
 	}
 	
 	@Test
 	public void getAccount() {
-		String url = "/accounts/{accountId}";
+		String url = "/accounts/{id}";
 		Account account = restTemplate.getForObject(url, Account.class, 0); 
-		assertThat(account.getName()).isEqualTo("Keith and Keri Donald");
+		assertThat(account.getName()).isEqualTo("John Doe");
 	}
 	
 	@Test
 	public void createAccount() {
 		String url = "/accounts";
 		// use a unique number to avoid conflicts
-		Long number = ThreadLocalRandom.current().nextLong(10000);
+		Long number = ThreadLocalRandom.current().nextLong(1000, 10000);
 		Account account = new Account(number, "John Doe");
 		URI newAccountLocation = restTemplate.postForLocation(url, account);
 		
@@ -53,17 +50,18 @@ public class AccountClientTests {
 	}
 
 	@Test
-	public void addAndDeleteBeneficiary() {
+	public void deleteAccount() {
 
-		String addUrl = "/accounts/{accountId}/beneficiaries";
-		URI newBeneficiaryLocation = restTemplate.postForLocation(addUrl, "David", 1);
-		Beneficiary newBeneficiary = restTemplate.getForObject(newBeneficiaryLocation, Beneficiary.class);
-		assertThat(newBeneficiary.getName()).isEqualTo("David");
+		String addUrl = "/accounts";
+		Account account = new Account(10001L, "David");
+		URI newAccountLocation = restTemplate.postForLocation(addUrl, account);
+		Account newAccount = restTemplate.getForObject(newAccountLocation, Account.class);
+		assertThat(newAccount.getName()).isEqualTo("David");
 
-		restTemplate.delete(newBeneficiaryLocation);
+		restTemplate.delete(newAccountLocation);
 
-		ResponseEntity<Beneficiary> response =
-				restTemplate.getForEntity(newBeneficiaryLocation, Beneficiary.class);
+		ResponseEntity<Account> response =
+				restTemplate.getForEntity(newAccountLocation, Account.class);
 
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 	}

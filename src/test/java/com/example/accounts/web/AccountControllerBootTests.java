@@ -47,7 +47,7 @@ public class AccountControllerBootTests {
                .andExpect(status().isOk())
                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                .andExpect(jsonPath("name").value("Test Doe"))
-               .andExpect(jsonPath("number").value("111"));
+               .andExpect(jsonPath("id").value("111"));
 
         // verify
         verify(accountManager).retrieve(anyLong());
@@ -77,7 +77,7 @@ public class AccountControllerBootTests {
         mockMvc.perform(get("/accounts"))
                .andExpect(status().isOk())
                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("$..number").value("123456789"))
+               .andExpect(jsonPath("$..id").value(1234567890))
                .andExpect(jsonPath("$..name").value("John Doe"));
 
         verify(accountManager).getAll();
@@ -87,9 +87,8 @@ public class AccountControllerBootTests {
     @Test
     public void createAccount() throws Exception {
 
-        Account testAccount = new Account(1234567890L, "Mary Jones");
-        testAccount.setId(21L);
-
+        Account testAccount = new Account(21L, "Mary Jones");
+        
         given(accountManager.save(any(Account.class)))
 				.willReturn(testAccount);
 
@@ -104,37 +103,12 @@ public class AccountControllerBootTests {
     }
 
     @Test
-    public void getBeneficiary() throws Exception {
-
-        Account account = new Account(1234567890L, "John Doe");
-        
-        given(accountManager.retrieve(anyLong()))
-				.willReturn(account);
-
-        mockMvc.perform(get("/accounts/{accountId}/beneficiaries/{beneficiaryName}", 0L, "Corgan"))
-               .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-               .andExpect(jsonPath("name").value("Corgan"))
-               .andExpect(jsonPath("allocationPercentage").value("0.1"));
-
-        verify(accountManager).retrieve(anyLong());
-    }
-
-    @Test
-    public void addBeneficiary() throws Exception {
-
-        mockMvc.perform(post("/accounts/{entityId}/beneficiaries", 0L)
-				            .content("Kate"))
-               .andExpect(status().isCreated())
-               .andExpect(header().string("Location", "http://localhost/accounts/0/beneficiaries/Kate"));
-    }
-
-    @Test
-    public void removeBeneficiary() throws Exception {
+    public void deleteAccount() throws Exception {
 
         Account account = new Account(1234567890L, "John Doe");
         given(accountManager.retrieve(anyLong())).willReturn(account);
 
-        mockMvc.perform(delete("/accounts/{entityId}/beneficiaries/{name}", 0L, "Corgan"))
+        mockMvc.perform(delete("/accounts/{id}", 1234567890L))
                .andExpect(status().isNoContent());
 
         verify(accountManager).retrieve(anyLong());
@@ -142,11 +116,10 @@ public class AccountControllerBootTests {
     }
 
     @Test
-    public void removeBeneficiaryFail() throws Exception {
-        Account account = new Account(1234567890L, "John Doe");
-        given(accountManager.retrieve(anyLong())).willReturn(account);
+    public void deleteAccountFail() throws Exception {
+        given(accountManager.retrieve(anyLong())).willReturn(null);
 
-        mockMvc.perform(delete("/accounts/{entityId}/beneficiaries/{name}", 0L, "Noname"))
+        mockMvc.perform(delete("/accounts/{id}", 150L))
                .andExpect(status().isNotFound());
 
         verify(accountManager).retrieve(anyLong());

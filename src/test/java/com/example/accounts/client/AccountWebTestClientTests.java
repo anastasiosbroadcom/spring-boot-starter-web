@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -14,7 +13,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.assertj.core.api.Assertions.*;
@@ -23,12 +21,7 @@ import static org.assertj.core.api.Assertions.*;
 public class AccountWebTestClientTests {
 
     @Autowired
-    private TestRestTemplate restTemplate;
-
-    @Autowired
     private WebTestClient webTestClient;
-
-    private Random random = new Random();
 
     @Test
     public void listAccounts_WebTestClient() {
@@ -42,14 +35,14 @@ public class AccountWebTestClientTests {
                      .expectBody(Account[].class)
                      .consumeWith(response -> {
                          Account[] accounts = response.getResponseBody();
-                         assertThat(accounts.length >= 21).isTrue();
-                         assertThat(accounts[0].getName()).isEqualTo("Keith and Keri Donald");
+                         assertThat(accounts.length >= 4).isTrue();
+                         assertThat(accounts[0].getName()).isEqualTo("John Doe");
                      });
     }
 
     @Test
     public void getAccount_WebTestClient() {
-        String url = "/accounts/{accountId}";
+        String url = "/accounts/{Id}";
 
         webTestClient.get()
                      .uri(url, 0)
@@ -58,7 +51,7 @@ public class AccountWebTestClientTests {
                      .expectBody(Account.class)
                      .consumeWith(response -> {
                          Account account = response.getResponseBody();
-                         assertThat(account.getName()).isEqualTo("Keith and Keri Donald");
+                         assertThat(account.getName()).isEqualTo("John Doe");
                      });
 
     }
@@ -67,7 +60,7 @@ public class AccountWebTestClientTests {
     public void createAccount_WebTestClient() {
         String url = "/accounts";
         // use a unique number to avoid conflicts
-        Long number = ThreadLocalRandom.current().nextLong(10000);
+        Long number = ThreadLocalRandom.current().nextLong(1000, 10000);
         Account account = new Account(number, "John Doe");
         
         webTestClient.post()
@@ -98,38 +91,24 @@ public class AccountWebTestClientTests {
     }
 
 	@Test
-	public void addAndDeleteBeneficiary_WebTestClient() {
+	public void deleteAccount_WebTestClient() {
 
-		String addUrl = "/accounts/{accountId}/beneficiaries";
+		String addUrl = "/accounts";
 
 		webTestClient.post().uri(addUrl, 1)
 					 .contentType(MediaType.APPLICATION_JSON)
 					 .accept(MediaType.APPLICATION_JSON)
-					 .body(Mono.just("David"), String.class)
+					 .body(Mono.just("{ \"id\": 999, \"name\": \"David\" }"), String.class)
 					 .exchange()
 					 .expectStatus().isCreated()
 					 .expectHeader().value("Location", location -> {
 			try {
 				URI newBeneficiaryLocation = new URI(location);
-				webTestClient.get()
-							 .uri(newBeneficiaryLocation)
-							 .exchange()
-							 .expectStatus().isOk()
-							 .expectBody(Beneficiary.class)
-							 .consumeWith(response -> {
-								 Beneficiary newBeneficiary = response.getResponseBody();
-								 assertThat(newBeneficiary.getName()).isEqualTo("David");
-							 });
-
+				
 				webTestClient.delete()
 							 .uri(newBeneficiaryLocation)
 							 .exchange()
 							 .expectStatus().isNoContent();
-
-				webTestClient.get()
-							 .uri(newBeneficiaryLocation)
-							 .exchange()
-							 .expectStatus().isNotFound();
 
 			} catch (URISyntaxException e) {
 				e.printStackTrace();

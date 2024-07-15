@@ -2,16 +2,20 @@ package com.example.accounts;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.LinkedList;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class FakeAccountManager implements AccountManager {
 
-    private List<Account> accounts = Arrays.asList(
+    private List<Account> accounts = new LinkedList<Account>(Arrays.asList(
         new Account(0L, "John Doe"),
         new Account(1L, ""),
         new Account(99L, ""),
         new Account(100L, "")
-    );
+    ));
 
     @Override
     public List<Account> getAll() {
@@ -29,7 +33,16 @@ public class FakeAccountManager implements AccountManager {
 
     @Override
     public Account save(Account newAccount) {
-        accounts.add(newAccount);
+        Account retrievedAccount = retrieve(newAccount.getId());
+        if(retrievedAccount == null){
+            accounts.add(newAccount);
+        } else{
+            retrievedAccount.setEmail(newAccount.getEmail());
+            retrievedAccount.setName(newAccount.getName());
+            retrievedAccount.setPassword(newAccount.getPassword());
+            retrievedAccount.setStatus(newAccount.getStatus());
+        }
+        
         return retrieve(newAccount.getId());
     }
 

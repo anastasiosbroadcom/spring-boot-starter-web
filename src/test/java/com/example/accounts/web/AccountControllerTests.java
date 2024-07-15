@@ -16,11 +16,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-//import org.junit.Assert;
-
-/**
- * A JUnit test case testing the AccountController.
- */
 public class AccountControllerTests {
 
 	private AccountController controller;
@@ -41,7 +36,7 @@ public class AccountControllerTests {
 	public void accountSummary() {
 		List<Account> accounts = controller.accountSummary();
 		assertThat(accounts).isNotNull();
-		assertThat(accounts.size()).isEqualTo(1);
+		assertThat(accounts.size()).isEqualTo(4);
 		assertThat(accounts.get(0).getId()).isEqualTo(Long.valueOf(0));
 	}
 
@@ -57,7 +52,6 @@ public class AccountControllerTests {
 		HttpEntity<?> result = controller.createAccount(newAccount);
 		assertThat(result).isNotNull();
 
-		// See StubAccountManager.nextEntityId - initialized to 3
 		assertThat(result.getHeaders().getLocation().toString()).isEqualTo("http://localhost/accounts/11223344");
 	}
 
@@ -69,9 +63,9 @@ public class AccountControllerTests {
 	@Test
 	public void deleteNonExistingAccountFail() {
 
-		assertThrows(NullPointerException.class, () -> {
+		assertThrows(IllegalArgumentException.class, () -> {
 			controller.deleteAccount(32L);
-		}, "Account with id 32 not found!");
+		}, "No such account with id 32");
 	}
 
 	/**
